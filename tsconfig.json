@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "baseUrl": ".", // This must be specified if "paths" is.
+    "paths": {
+      "*": [
+        "*", // Matches
+        "src/*" // Matches stuff inside "src" directory.
+      ]
+    },
+    "noEmit": true // don't write any .js files
+  },
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Recommended",
+  "exclude": [
+    "visualizations",
+    "node_modules",
+    "dist",
+    "build",
+    "build-esm",
+    "build-cjs",
+    "bui"
+  ]
+}
