@@ -37,5 +37,42 @@ What do you get if you add up all of the invalid IDs?day1/sampleInput.txt day1/s
 */
 
 export const day2part1 = (raw: string) => {
-  return 0;
+  const sum = raw.split(",").reduce((acc, curr) => {
+    return acc + getInvalidIDSum(curr);
+  }, 0);
+  return sum;
+};
+
+const extractRange = (range: string) => {
+  return range.split("-");
+};
+
+export const getInvalidIDSum = (rangeRaw: string) => {
+  const range = extractRange(rangeRaw);
+  const invalids = getInvalidIDs(range);
+  return invalids.reduce((sum, curr) => sum + curr, 0);
+};
+
+export const getInvalidIDs = (range: string[]) => {
+  const start = Number(range[0]);
+  const end = Number(range[1]);
+  const invalidIDs: number[] = [];
+  for (let i = start; i <= end; i++) {
+    if (!validateID(i)) {
+      invalidIDs.push(i);
+    }
+  }
+  return invalidIDs;
+};
+
+export const validateID = (idToTest: number) => {
+  // you can find the invalid IDs by looking for any ID which is made only of some sequence of digits repeated twice
+  // None of the numbers have leading zeroes
+
+  const idString = idToTest.toString();
+  const length = idString.length;
+  const first = idString.slice(0, length / 2);
+  const last = idString.slice(length / 2);
+  // console.log({ first, last });
+  return first !== last;
 };
