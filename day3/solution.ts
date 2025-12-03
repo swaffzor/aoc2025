@@ -29,6 +29,29 @@ There are many batteries in front of you. Find the maximum joltage possible from
  */
 
 export const day3part1 = (raw: string) => {
-  const input = raw.split("\n");
-  return 0;
+  const powerBanks = raw.split("\n");
+  const result = powerBanks.reduce((sum, bank) => {
+    return sum + processBank(bank);
+  }, 0);
+  return result;
+};
+
+export const processBank = (bank: string) => {
+  const batteries = bank.split("").map((b) => Number(b));
+
+  const best = batteries.reduce(
+    (candidates, battery, index) => {
+      const temp = { ...candidates };
+      if (index !== batteries.length - 1 && battery > candidates.highest) {
+        temp.highest = battery;
+        temp.next = 0;
+      } else if (battery > candidates.next) {
+        temp.next = battery;
+      }
+      return temp;
+    },
+    { highest: 0, next: 0 }
+  );
+
+  return Number(`${best.highest}${best.next}`);
 };
