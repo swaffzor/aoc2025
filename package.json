@@ -4,8 +4,8 @@
   "description": "advent of code 2025",
   "scripts": {
     "test": "jest",
-    "part1": "tsc && node day2/part1.js",
-    "solution": "tsc && node day2/solution.js"
+    "part1": "tsc && node day3/part1.js",
+    "solution": "tsc && node day3/solution.js"
   },
   "repository": {
     "type": "git",
