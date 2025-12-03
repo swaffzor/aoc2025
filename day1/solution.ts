@@ -128,18 +128,21 @@ export const day1part2 = (raw: string) => {
   return temp.count;
 };
 
-const turnDial2 = (dialPosition: number, direction: string, offset: number) => {
+export const turnDial2 = (
+  dialPosition: number,
+  direction: string,
+  offset: number
+) => {
   // offset < 0, no op
   // offset < 100, count += dial.offset + offset
   // offset > 100, count += offset/100
   const operation = ["L", "l"].includes(direction) ? -1 : 1;
-  // const stringOffset = offset.toString();
-  // const substringed = stringOffset.substring(stringOffset.length - 2);
   const dividedCount = Math.floor(offset / 100);
   const remainingOffset = offset % 100;
   const count = offset > 99 ? dividedCount : 0;
   const distance = operation * (dividedCount > 0 ? remainingOffset : offset);
-  const target = dialPosition + distance;
+  const target =
+    (dialPosition === 0 && direction === "L" ? 100 : dialPosition) + distance;
   const bonusPoint = target === 0 || target === 100 ? 1 : 0;
 
   const endPos =
