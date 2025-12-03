@@ -35,12 +35,76 @@ Adding up all the invalid IDs in this example produces 1227775554.
 
 What do you get if you add up all of the invalid IDs?day1/sampleInput.txt day1/solution.ts day1/test.ts
 */
+/*
+--- Part Two ---
+
+The clerk quickly discovers that there are still invalid IDs in the ranges in your list. Maybe the young Elf was doing other silly patterns as well?
+
+Now, an ID is invalid if it is made only of some sequence of digits repeated at least twice. So, 12341234 (1234 two times), 123123123 (123 three times), 1212121212 (12 five times), and 1111111 (1 seven times) are all invalid IDs.
+
+From the same example as before:
+
+11-22 still has two invalid IDs, 11 and 22.
+95-115 now has two invalid IDs, 99 and 111.
+998-1012 now has two invalid IDs, 999 and 1010.
+1188511880-1188511890 still has one invalid ID, 1188511885.
+222220-222224 still has one invalid ID, 222222.
+1698522-1698528 still contains no invalid IDs.
+446443-446449 still has one invalid ID, 446446.
+38593856-38593862 still has one invalid ID, 38593859.
+565653-565659 now has one invalid ID, 565656.
+824824821-824824827 now has one invalid ID, 824824824.
+2121212118-2121212124 now has one invalid ID, 2121212121.
+Adding up all the invalid IDs in this example produces 4174379265.
+
+What do you get if you add up all of the invalid IDs using these new rules?
+ */
 
 export const day2part1 = (raw: string) => {
   const sum = raw.split(",").reduce((acc, curr) => {
     return acc + getInvalidIDSum(curr);
   }, 0);
   return sum;
+};
+
+export const day2part2 = (raw: string) => {
+  const sum = raw.split(",").reduce((acc, curr) => {
+    return acc + getInvalidIDSumPart2(curr);
+  }, 0);
+  return sum;
+};
+
+export const getInvalidIDSumPart2 = (rangeRaw: string) => {
+  const range = extractRange(rangeRaw);
+  const invalids = getInvalidIDsPart2(range);
+  return invalids.reduce((sum, curr) => sum + curr, 0);
+};
+
+export const getInvalidIDsPart2 = (range: string[]) => {
+  const start = Number(range[0]);
+  const end = Number(range[1]);
+  const invalidIDs: number[] = [];
+  for (let i = start; i <= end; i++) {
+    if (!validateIDPart2(i)) {
+      invalidIDs.push(i);
+    }
+  }
+  return invalidIDs;
+};
+
+export const validateIDPart2 = (idToTest: number) => {
+  // is invalid if it is made only of some sequence of digits repeated at least twice. So, 12341234 (1234 two times), 123123123 (123 three times), 1212121212 (12 five times), and 1111111 (1 seven times) are all invalid IDs.
+  const idString = idToTest.toString();
+  for (let i = 1; i < idString.length; i++) {
+    const pattern = idString.slice(0, i);
+    const result = idString.split(pattern);
+    const patternRepeats = result.every((r) => r === "");
+    if (result.length >= 2 && patternRepeats) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 const extractRange = (range: string) => {
