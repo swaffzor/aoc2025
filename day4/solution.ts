@@ -40,7 +40,20 @@ x.x.@@@.x.
 Consider your complete diagram of the paper roll locations. How many rolls of paper can be accessed by a forklift?
  */
 
+import { extractDataToPointGrid, getPointNeighbors } from "../utils";
+
 export const day4part1 = (raw: string) => {
-  const powerBanks = raw.split("\n");
-  return powerBanks.length;
+  const grid = extractDataToPointGrid<string>(raw);
+
+  const result = grid
+    .flat()
+    .filter((p) => p.value === "@")
+    .reduce((count, curr) => {
+      const neighbors = getPointNeighbors(curr, grid, true);
+      return neighbors.filter((p) => p.value === "@").length < 4
+        ? count + 1
+        : count;
+    }, 0);
+
+  return result;
 };
