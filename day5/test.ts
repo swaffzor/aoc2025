@@ -2,7 +2,7 @@ import { readInputForDay } from "../utils";
 import { day5part1, day5part2 } from "./solution";
 
 describe("day5", () => {
-  describe.skip("part1", () => {
+  describe("part1", () => {
     it("solution", () => {
       expect(day5part1(readInputForDay(5, true))).toEqual(3);
       console.log("day5part1 ANSWER:", day5part1(readInputForDay(5)));

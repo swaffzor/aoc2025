@@ -54,7 +54,36 @@ The ingredient IDs that these ranges consider to be fresh are 3, 4, 5, 10, 11, 1
 Process the database file again. How many ingredient IDs are considered to be fresh according to the fresh ingredient ID ranges?
  */
 
-export const day5part2 = (raw: string) => {};
+export const day5part2 = (raw: string) => {
+  const { ranges } = parseIngredients(raw);
+  const merged = mergeRanges(ranges.map((r) => [r.start, r.end]));
+  const result = merged.reduce((count, range) => {
+    return count + range[1] - range[0];
+  }, 0);
+  return result + merged.length;
+};
+
+const mergeRanges = (ranges: Ranges) => {
+  if (ranges.length === 0) return [];
+
+  const sorted = [...ranges].sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  let [currentStart, currentEnd] = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const [start, end] = sorted[i];
+    if (start <= currentEnd) {
+      if (end > currentEnd) currentEnd = end;
+    } else {
+      // disjoint, start new merge
+      merged.push([currentStart, currentEnd]);
+      [currentStart, currentEnd] = [start, end];
+    }
+  }
+
+  merged.push([currentStart, currentEnd]);
+  return merged;
+};
 
 export const day5part1 = (raw: string) => {
   const { ranges, ingredients } = parseIngredients(raw);
@@ -66,6 +95,7 @@ export const day5part1 = (raw: string) => {
   return result;
 };
 
+type Ranges = number[][]; // [start, end][]
 interface Range {
   start: number;
   end: number;
