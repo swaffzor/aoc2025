@@ -1,6 +1,5 @@
-import { Point } from "types";
-import { extractDataToPointGrid, readInputForDay } from "../utils";
 import { day5part1 } from "./solution";
+import { readInputForDay } from "../utils";
 
 describe("day5", () => {
   describe("part1", () => {

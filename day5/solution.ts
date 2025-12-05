@@ -38,5 +38,33 @@ Process the database file from the new inventory management system. How many of 
  */
 
 export const day5part1 = (raw: string) => {
-  return 0;
+  const { ranges, ingredients } = parseIngredients(raw);
+
+  const result = ingredients.reduce((count, ingredient) => {
+    return count + (isFresh(ingredient, ranges) ? 1 : 0);
+  }, 0);
+
+  return result;
 };
+
+interface Range {
+  start: number;
+  end: number;
+}
+
+const parseIngredients = (raw: string) => {
+  const [rangesString, ingredientsString] = raw.split("\n\n"); // split on the empty line to separate ingredients
+  const ranges = rangesString.split("\n").map((r) => {
+    const [start, end] = r.split("-").map(Number);
+    return { start, end };
+  });
+
+  return { ranges, ingredients: ingredientsString.split("\n").map(Number) };
+};
+
+const isFresh = (ingredient: number, ranges: Range[]) =>
+  ranges.reduce(
+    (isFrsh, range) =>
+      isFrsh || (range.start <= ingredient && ingredient <= range.end),
+    false
+  );
