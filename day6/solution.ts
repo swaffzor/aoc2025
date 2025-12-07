@@ -29,6 +29,67 @@ Of course, the actual worksheet is much wider. You'll need to make sure to unrol
 
 Solve the problems on the math worksheet. What is the grand total found by adding together all of the answers to the individual problems?
  */
+/*
+--- Part Two ---
+
+The big cephalopods come back to check on how things are going. When they see that your grand total doesn't match the one expected by the worksheet, they realize they forgot to explain how to read cephalopod math.
+
+Cephalopod math is written right-to-left in columns. Each number is given in its own column, with the most significant digit at the top and the least significant digit at the bottom. (Problems are still separated with a column consisting only of spaces, and the symbol at the bottom of the problem is still the operator to use.)
+
+Here's the example worksheet again:
+
+123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  
+Reading the problems right-to-left one column at a time, the problems are now quite different:
+
+The rightmost problem is 4 + 431 + 623 = 1058
+The second problem from the right is 175 * 581 * 32 = 3253600
+The third problem from the right is 8 + 248 + 369 = 625
+Finally, the leftmost problem is 356 * 24 * 1 = 8544
+Now, the grand total is 1058 + 3253600 + 625 + 8544 = 3263827.
+
+Solve the problems on the math worksheet again. What is the grand total found by adding together all of the answers to the individual problems?
+ */
+
+export const day6part2 = (raw: string) => {
+  return parseInput2(raw).reduce((sum, row) => {
+    // const indx = row.length - 1;
+    // return sum + operate(row.slice(0, indx), row[indx] === -1 ? "add" : "mul");
+    return sum;
+  }, 0);
+};
+
+const parseInput2 = (raw: string) => {
+  const rows = raw.split("\n");
+  const last = rows[rows.length - 1];
+  rows.splice(rows.length - 1, 1);
+  const goodgood: string[][] = [];
+  const problemLength = rows.length;
+  const rowLength = rows[0].length;
+
+  const operators = last.split("").filter((n) => n !== " ");
+
+  for (let i = 0; i < rowLength; i++) {
+    for (let j = 0; j < problemLength; j++) {
+      const row = rows[j];
+      const val = row[i];
+      if (i === goodgood.length) {
+        goodgood.push([val]);
+      } else {
+        if (val !== " ") {
+          goodgood[goodgood.length - 1].push(val);
+        }
+      }
+    }
+  }
+
+  const roww = goodgood.map((row) => Number(row.join("")));
+  return roww.reduce((rows, val, index) => {
+    return [];
+  }, [] as number[]);
+};
 
 export const day6part1 = (raw: string) => {
   const result = parseInput(raw).reduce((sum, row) => {

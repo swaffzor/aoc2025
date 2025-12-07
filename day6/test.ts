@@ -1,5 +1,5 @@
 import { readInputForDay } from "../utils";
-import { day6part1 } from "./solution";
+import { day6part1, day6part2 } from "./solution";
 
 describe("day6", () => {
   describe("part1", () => {
@@ -9,8 +9,8 @@ describe("day6", () => {
     });
   });
 
-  // it("part2 solution", () => {
-  //   expect(day6part2(readInputForDay(6, true))).toEqual(14);
-  //   console.log("day6part2 ANSWER:", day6part2(readInputForDay(6)));
-  // });
+  it("part2 solution", () => {
+    expect(day6part2(readInputForDay(6, true))).toEqual(3263827);
+    console.log("day6part2 ANSWER:", day6part2(readInputForDay(6)));
+  });
 });
