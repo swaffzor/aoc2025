@@ -274,7 +274,7 @@ export const getPointGridNodes = <T>(grid: Point<T>[][]) => {
   const nodes: Record<string, Location<T>> = {};
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid.length; x++) {
-      if (grid[y][x].value !== undefined) {
+      if (grid[y][x]?.value !== undefined) {
         nodes[`${x},${y}`] = {
           col: x,
           row: y,
@@ -447,15 +447,21 @@ export const logGridValues = <T>(
 };
 
 export const drawGrid = <T>(graph: SquareGrid<T>, style: Style) => {
-  // console.log('___'.repeat(graph.width))
+  console.log("___".repeat(graph.width));
   const result: string[][] = [];
   for (let row = 0; row < graph.height; row++) {
     const rowResult: string[] = [];
     for (let col = 0; col < graph.width; col++) {
+      const tile = graph.nodes[`${col},${row}`].value as string;
       // const dir = col === 0 ? ':<' : ''
-      const tile = drawTile(graph, `${col},${row}`, style);
-      // process.stdout.write(tile)
+      process.stdout.write(tile);
       rowResult.push(tile);
+    }
+
+    if (style?.labels && style?.labels === row) {
+      rowResult.push(
+        "<".concat(style?.labels.toString() ?? "", ":", style?.goal ?? "")
+      );
     }
     process.stdout.write(rowResult.join(""));
     process.stdout.write("\n");
@@ -516,6 +522,7 @@ interface Style {
   start?: string;
   goal?: string;
   values?: Record<string, string>;
+  labels?: number;
 }
 
 // can be used for distance maps, procedural map generation, etc.
