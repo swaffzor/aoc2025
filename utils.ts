@@ -168,13 +168,54 @@ export const extractDataToGraph = <T>(
   );
 };
 
+export const extractDataTo3DGraph = <T>({
+  input,
+  wallChar,
+  getNeighbors,
+}: {
+  input: string;
+  wallChar?: string;
+  getNeighbors?: (
+    id: string,
+    ignoreWalls?: boolean
+  ) => Record<string, Location<T>>;
+}) => {
+  const nodes: Record<string, Location<T>> = {};
+  const lines = input.split("\n");
+
+  let deepest = 0;
+  let width = 0;
+  for (let row = 0; row < lines.length; row++) {
+    const id = lines[row];
+    const values = id.split(",").map(Number);
+    nodes[id] = {
+      col: values[0],
+      row: values[1],
+      z: values[2],
+      id,
+      value: id as T,
+    };
+    width = lines[row].length;
+    deepest = values[2] > deepest ? values[2] : deepest;
+  }
+
+  return makeSquareGrid<T>(
+    width,
+    lines.length,
+    nodes,
+    wallChar ? getWalls<T>(Object.values(nodes), wallChar) : undefined,
+    getNeighbors,
+    deepest
+  );
+};
+
 export const extractDataToWeightedGraph = <T>(
   input: string,
   weights: Record<string, number> = {},
   getCost?: (from: Location<T>, to: Location<T>, cost: number) => number,
   wallChar?: string
 ): WeightedGrid<T> => {
-  const graph = extractDataToGraph<T>(input, wallChar);
+  const graph = extractDataTo3DGraph<T>({ input, wallChar });
   const costs: Record<string, number> =
     weights.length > 0
       ? weights
@@ -305,7 +346,7 @@ export const getWalls = <T>(locations: Location<T>[], wallChar: string) => {
   const walls = new Set<string>();
   for (const location of locations) {
     if (location.value === wallChar) {
-      walls.add(`${location.col},${location.row}`);
+      walls.add(getPointId<T>(location));
     }
   }
   return walls;
@@ -338,32 +379,60 @@ const getNeighbors = <T>(
   return tempNeighbors;
 };
 
-const isInBounds = <T>(point: Point<T>, width: number, height: number) =>
-  point.col >= 0 && point.col < width && point.row >= 0 && point.row < height;
+const isInBounds = <T>(
+  point: Point<T>,
+  width: number,
+  height: number,
+  depth?: number
+) =>
+  point.z && depth
+    ? point.col >= 0 &&
+      point.col < width &&
+      point.row >= 0 &&
+      point.row < height &&
+      point.z >= 0 &&
+      point.z < depth
+    : point.col >= 0 &&
+      point.col < width &&
+      point.row >= 0 &&
+      point.row < height;
 
 const isPointValid = <T>(point: Point<T>, walls: Set<string>) =>
-  !walls.has(`${point.col},${point.row}`);
+  !walls.has(getPointId(point));
+
+const getPointId = <T>(point: Point<T>) =>
+  point.z
+    ? `${point.col},${point.row},${point.z}`
+    : `${point.col},${point.row}`;
 
 export const makeSquareGrid = <T>(
   width: number,
   height: number,
   nodes: Record<string, Location<T>> = {},
-  walls: Set<string> = new Set()
+  walls: Set<string> = new Set(),
+  overrideGetNeighbors?: (
+    id: string,
+    ignoreWalls?: boolean
+  ) => Record<string, Location<T>>,
+  depth = 0
 ): SquareGrid<T> => {
   return {
     width,
     height,
     nodes,
     walls,
-    inBounds: (point) => isInBounds(point, width, height),
+    depth,
+    inBounds: (point) => isInBounds(point, width, height, depth),
     isValid: (point) => isPointValid(point, walls),
     neighbors: (id, ignoreWalls) =>
-      getNeighbors(
-        id,
-        nodes,
-        (p) => isInBounds(p, width, height),
-        (p) => (ignoreWalls ? true : isPointValid(p, walls))
-      ),
+      overrideGetNeighbors
+        ? overrideGetNeighbors(id, ignoreWalls)
+        : getNeighbors(
+            id,
+            nodes,
+            (p) => isInBounds(p, width, height, depth),
+            (p) => (ignoreWalls ? true : isPointValid(p, walls))
+          ),
   };
 };
 

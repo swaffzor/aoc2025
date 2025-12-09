@@ -52,6 +52,102 @@ After making the ten shortest connections, there are 11 circuits: one circuit wh
 Your list contains many junction boxes; connect together the 1000 pairs of junction boxes which are closest together. Afterward, what do you get if you multiply together the sizes of the three largest circuits?
 */
 
-export const day8part1 = (raw: string) => {
-  return 0;
+import { WeightedGrid } from "types";
+import { extractDataToWeightedGraph, makeSquareGrid } from "../utils";
+
+export const day8part1 = (raw: string, numConnections: number) => {
+  const graph = extractDataToWeightedGraph<string>(raw);
+  const distanceMap = getDistances(graph, numConnections);
+
+  const connections: string[] = distanceMap.map((dm) => dm.id);
+  const circuits: string[][] = [[connections[0]]];
+  for (let i = 1; i < numConnections; i++) {
+    const [left, right] = connections[i].split("-");
+
+    const idk = [...circuits].map((circuit) => {
+      const temp = [];
+      return circuit.map((connection) => {
+        const foundLeft = connection.includes(left);
+        const foundRight = connection.includes(right);
+        if (foundLeft && foundRight) {
+          temp.push(connection);
+        } else if (foundLeft || foundRight) {
+          if (foundLeft) {
+            temp.push(`${connection}-${left}`);
+          }
+          if (foundRight) {
+            temp.push(`${connection}-${right}`);
+          }
+          // return temp
+        } else {
+          circuits.push([connections[i]]);
+        }
+      });
+    });
+  }
+
+  return circuits.reduce((product, curr) => {
+    return product * curr.length;
+  }, 1);
+};
+
+// A) calculate the distance between each pair of nodes
+//  - distance formula
+//  - how to iterate through the list?
+// B) sort by distance, slice off first 1000 pairs
+// C) connect all of the closest nodes to each other, keep track of node size in each circuit
+// D) multiply the top 3 node sizes
+
+// 3D distance: d(p,q) = sqrt((p1-q1)^2 + (p2-q2)^2 + (p3-q3)^2)
+export const calcDistance = (p: number[], q: number[], d: number = 3) => {
+  if (p.length < d || q.length < d) return -1;
+
+  const collection = [];
+  for (let n = 0; n < d; n++) {
+    const squaredDiff = Math.pow(p[n] - q[n], 2);
+    collection.push(squaredDiff);
+  }
+
+  return Math.sqrt(collection.reduce((sum, curr) => sum + curr));
+};
+
+interface LocationMap {
+  id: string;
+  value: number;
+}
+
+interface Circuit {
+  connections: string[];
+}
+
+export const getDistances = (
+  graph: WeightedGrid<string>,
+  numConnections: number
+) => {
+  const distances: LocationMap[] = [];
+  const nodes = Object.keys(graph.nodes).map((n) => n.split(","));
+  for (let i = 0; i < graph.height; i++) {
+    for (let j = i + 1; j < graph.height; j++) {
+      const node = nodes[i];
+      const goal = nodes[j];
+      const d = calcDistance(node.map(Number), goal.map(Number));
+      const key = `${node.join()}-${goal.join()}`;
+      distances.push({ id: key, value: d });
+    }
+  }
+  return distances.sort((a, b) => a.value - b.value);
+  // .slice(0, numConnections);
+};
+
+export const makeConnection = (
+  map: LocationMap,
+  circuits: Circuit[],
+  ids: string[]
+) => {
+  const mapNodes = map.id.split("-");
+  const temp1 = circuits.flatMap((c) => c.connections)[0];
+  const tests = "162,817,812-425,690,689".includes(mapNodes[0]);
+  if (temp1.includes(mapNodes[0]) || temp1.includes(mapNodes[1])) {
+    console.log("make a connection");
+  }
 };

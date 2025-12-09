@@ -59,9 +59,14 @@ export interface Graph<T> {
 export interface SquareGrid<T> extends Graph<T> {
   width: number;
   height: number;
+  depth?: number;
   walls: Set<string>;
   inBounds: (point: Point<T>) => boolean;
   isValid: (point: Point<T>) => boolean;
+}
+
+export interface CubeGraph<T> extends SquareGrid<T> {
+  depth: number;
 }
 
 export interface WeightedGraph<T> extends Graph<T> {
