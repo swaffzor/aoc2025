@@ -75,6 +75,34 @@ Ultimately, the largest rectangle you can make in this example has area 50. One 
 Using two red tiles as opposite corners, what is the largest area of any rectangle you can make?
 */
 
+import { extractDataToWeightedGraph } from "../utils";
+
 export const day9part1 = (raw: string) => {
-  return 0;
+  const graph = extractDataToWeightedGraph<string>(raw);
+  const nodeArr = Object.keys(graph.nodes);
+  const areaMap: { [x: string]: number } = {};
+
+  for (let i = 0; i < nodeArr.length; i++) {
+    const start = nodeArr[i];
+    for (let j = i + 1; j < nodeArr.length; j++) {
+      const end = nodeArr[j];
+      const area = calcArea(start, end);
+      const id = `${start}-${end}`;
+      areaMap[id] = area;
+    }
+  }
+
+  const result = Object.values(areaMap).reduce((largest, curr) => {
+    return largest > curr ? largest : curr;
+  }, 0);
+  return result;
+};
+
+const calcArea = (start: string, goal: string) => {
+  const [startX, startY] = start.split(",").map(Number);
+  const [goalX, goalY] = goal.split(",").map(Number);
+
+  const dx = Math.abs(goalX - startX) + 1;
+  const dy = Math.abs(goalY - startY) + 1;
+  return dx * dy;
 };
